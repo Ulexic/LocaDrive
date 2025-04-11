@@ -1,39 +1,15 @@
 @startuml
-entity "Client" {
-* id
-* firstname
-* lastname
-* email
-* password
-* licenceIssueDate
-}
-
-entity "Booking" {
-* id
-* startDate
-* endDate
-* vehicleId
-}
-
-entity "Order" {
-* id
-* status
-* payment
-}
-
-entity "Payment" {
-* id
-* amount
-}
-
-entity "Insurance" {
-* id
-* name
-* price
-}
-
-Client ||--o{ Booking : "has many"
-Booking ||--|| Order : "has one"
-Order ||--|| Payment : "has one"
-Booking }o--|| Insurance : "can have many"
+actor "Admin" as fc
+actor "Client"as cli
+usecase "Vehicle" as UC1
+usecase "Order" as order
+usecase "Booking" as booking
+usecase "Insurance" as insurance
+usecase "Payment" as payment
+fc --> UC1 : Gère
+cli --> UC1 : Consulte & réserve
+cli --> order : Créer
+booking --> order : Inclu
+insurance --> booking : Peu être incluse
+payment --> order : Inclus 
 @enduml
