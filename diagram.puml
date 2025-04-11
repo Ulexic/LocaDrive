@@ -1,0 +1,39 @@
+@startuml
+entity "Client" {
+* id
+* firstname
+* lastname
+* email
+* password
+* licenceIssueDate
+}
+
+entity "Reservation" {
+* id
+* startDate
+* endDate
+* vehicleId
+}
+
+entity "Order" {
+* id
+* status
+* payment
+}
+
+entity "Payment" {
+* id
+* amount
+}
+
+entity "Insurance" {
+* id
+* name
+* price
+}
+
+Client ||--o{ Reservation : "has many"
+Reservation ||--|| Order : "has one"
+Order ||--|| Payment : "has one"
+Reservation }o--|| Insurance : "can have many"
+@enduml
