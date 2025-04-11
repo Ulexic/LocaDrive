@@ -8,7 +8,7 @@ entity "Client" {
 * licenceIssueDate
 }
 
-entity "Reservation" {
+entity "Booking" {
 * id
 * startDate
 * endDate
@@ -32,8 +32,8 @@ entity "Insurance" {
 * price
 }
 
-Client ||--o{ Reservation : "has many"
-Reservation ||--|| Order : "has one"
+Client ||--o{ Booking : "has many"
+Booking ||--|| Order : "has one"
 Order ||--|| Payment : "has one"
-Reservation }o--|| Insurance : "can have many"
+Booking }o--|| Insurance : "can have many"
 @enduml
