@@ -2,10 +2,10 @@
 
 namespace App\Controller;
 
-use App\Application\Reservation\AddInsuranceUseCase;
-use App\Application\Reservation\CreateBookingUseCase;
-use App\Application\Reservation\DeleteBookingUseCase;
-use App\Application\Reservation\RemoveInsuranceUseCase;
+use App\Application\Booking\AddInsuranceUseCase;
+use App\Application\Booking\CreateBookingUseCase;
+use App\Application\Booking\DeleteBookingUseCase;
+use App\Application\Booking\RemoveInsuranceUseCase;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,28 +16,28 @@ class BookingController extends AbstractController
     private AddInsuranceUseCase $addInsuranceUseCase;
     private RemoveInsuranceUseCase $removeInsuranceUseCase;
 
-    private CreateBookingUseCase $createReservationUseCase;
+    private CreateBookingUseCase $createBookingUseCase;
 
-    private DeleteBookingUseCase $deleteReservationUseCase;
+    private DeleteBookingUseCase $deleteBookingUseCase;
 
 
-    public function __construct(AddInsuranceUseCase $addInsuranceUseCase, RemoveInsuranceUseCase $removeInsuranceUseCase, CreateBookingUseCase $createReservationUseCase, DeleteBookingUseCase $deleteReservationUseCase)
+    public function __construct(AddInsuranceUseCase $addInsuranceUseCase, RemoveInsuranceUseCase $removeInsuranceUseCase, CreateBookingUseCase $createBookingUseCase, DeleteBookingUseCase $deleteBookingUseCase)
     {
-        $this->createReservationUseCase = $createReservationUseCase;
-        $this->deleteReservationUseCase = $deleteReservationUseCase;
+        $this->createBookingUseCase = $createBookingUseCase;
+        $this->deleteBookingUseCase = $deleteBookingUseCase;
         $this->removeInsuranceUseCase = $removeInsuranceUseCase;
         $this->addInsuranceUseCase = $addInsuranceUseCase;
     }
 
-    #[Route(path: '/client/{clientId}/reservation/{reservationId}/insurance/{insuranceId}', name: 'add_insurance', methods: ['POST'])]
+    #[Route(path: '/client/{clientId}/booking/{bookingId}/insurance/{insuranceId}', name: 'add_insurance', methods: ['POST'])]
     public function addInsurance(Request $request): Response
     {
         $clientId = $request->get('clientId');
         $insuranceId = $request->get('insuranceId');
-        $reservationId = $request->get('reservationId');
+        $bookingId = $request->get('bookingId');
 
         try {
-            $reservation = $this->addInsuranceUseCase->execute($reservationId, $insuranceId, $clientId);
+            $booking = $this->addInsuranceUseCase->execute($bookingId, $insuranceId, $clientId);
         } catch (\Exception $e) {
             return new Response($this->json([
                 'status' => 'error',
@@ -47,11 +47,11 @@ class BookingController extends AbstractController
 
         return new Response($this->json([
             'status' => 'success',
-            'reservation' => $reservation
+            'booking' => $booking
         ]));
     }
 
-    #[Route(path: '/client/{clientId}/reservation/{insuranceId}/insurance', name: 'delete_insurance', methods: ['DELETE'])]
+    #[Route(path: '/client/{clientId}/booking/{insuranceId}/insurance', name: 'delete_insurance', methods: ['DELETE'])]
     public function deleteInsurance(Request $request): Response
     {
         $clientId = $request->get('clientId');
@@ -72,8 +72,8 @@ class BookingController extends AbstractController
         ]));
     }
 
-    #[Route(path: '/client/{id}/reservation', name: 'create_reservation', methods: ['POST'])]
-    public function createReservation(Request $request): Response
+    #[Route(path: '/client/{id}/booking', name: 'create_booking', methods: ['POST'])]
+    public function createBooking(Request $request): Response
     {
         $clientId = $request->get('id');
 
@@ -84,7 +84,7 @@ class BookingController extends AbstractController
         $endDate = $data['endDate'] ?? null;
 
         try {
-            $reservation = $this->createReservationUseCase->execute($clientId, $vehicleId, $startDate, $endDate);
+            $booking = $this->createBookingUseCase->execute($clientId, $vehicleId, $startDate, $endDate);
         } catch (\Exception $e) {
             return new Response($this->json([
                 'status' => 'error',
@@ -94,18 +94,18 @@ class BookingController extends AbstractController
 
         return new Response($this->json([
             'status' => 'success',
-            'reservation' => $reservation
+            'booking' => $booking
         ]));
     }
 
-    #[Route(path: '/client/{clientId}/reservation/{reservationId}', name: 'delete_reservation', methods: ['DELETE'])]
-    public function deleteReservation(Request $request): Response
+    #[Route(path: '/client/{clientId}/booking/{bookingId}', name: 'delete_booking', methods: ['DELETE'])]
+    public function deleteBooking(Request $request): Response
     {
         $clientId = $request->get('clientId');
-        $reservationId = $request->get('reservationId');
+        $bookingId = $request->get('bookingId');
 
         try {
-            $this->deleteReservationUseCase->execute($reservationId, $clientId);
+            $this->deleteBookingUseCase->execute($bookingId, $clientId);
         } catch (\Exception $e) {
             return new Response($this->json([
                 'status' => 'error',

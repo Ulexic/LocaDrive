@@ -204,15 +204,15 @@ class Client implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function checkHasPayment($payment): void
     {
-        if (!$this->getCurrentOrder()->getPayment() === $payment) {
+        if ($this->getCurrentOrder()->getPayment()->getId() != $payment->getId()) {
             throw new \InvalidArgumentException('Client does not have this payment.');
         }
     }
 
-    public function checkHasReservation($reservation): void
+    public function checkHasBooking($booking): void
     {
-        if (!$this->getCurrentOrder()->getReservations()->contains($reservation)) {
-            throw new \InvalidArgumentException('Client does not have this reservation.');
+        if (!$this->getCurrentOrder()->getBookings()->contains($booking)) {
+            throw new \InvalidArgumentException('Client does not have this booking.');
         }
     }
 }

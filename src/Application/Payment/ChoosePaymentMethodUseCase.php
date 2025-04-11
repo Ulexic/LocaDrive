@@ -38,11 +38,18 @@ class ChoosePaymentMethodUseCase
         }
     }
 
+    private function checkClient($clientId, $payment): void {
+        $client = $this->clientRepository->find($clientId);
+        if (!$client) {
+            throw new \InvalidArgumentException('Client not found');
+        }
+
+        $client->checkHasPayment($payment);
+    }
     public function execute($paymentId, $method, $clientId): array
     {
         $payment = $this->getPayment($paymentId);
-        $client = $this->clientRepository->find($clientId);
-        $client->checkHasPayment($payment);
+        $this->checkClient($clientId, $payment);
 
         $payment->setMethod($method);
 

@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\ReservationRepository;
+use App\Repository\BookingRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: ReservationRepository::class)]
+#[ORM\Entity(repositoryClass: BookingRepository::class)]
 class Booking
 {
     #[ORM\Id]
@@ -28,7 +28,7 @@ class Booking
     #[ORM\ManyToOne(targetEntity: Insurance::class)]
     private ?Insurance $insurance = null;
 
-    #[ORM\ManyToOne(targetEntity: Order::class, inversedBy: 'reservations')]
+    #[ORM\ManyToOne(targetEntity: Order::class, inversedBy: 'bookings')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Order $order = null;
 

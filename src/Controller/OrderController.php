@@ -23,7 +23,7 @@ class OrderController extends AbstractController
         $orderId = $request->get('orderId');
         $clientId = $request->get('clientId');
 
-        $order = $this->payUseCase->execute($clientId, $orderId);
+        $order = $this->payUseCase->execute($orderId, $clientId);
 
         return new Response($this->json([
             'status' => 'success',

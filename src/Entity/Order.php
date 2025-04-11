@@ -25,7 +25,7 @@ class Order
     private ?string $status = null;
 
     #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'order', cascade: ['persist', 'remove'])]
-    private Collection $reservations;
+    private Collection $bookings;
 
 
     #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'orders')]
@@ -36,11 +36,11 @@ class Order
     public const STATUS_PAID = 'paid';
     public const STATUS_CANCELLED = 'cancelled';
 
-    public function __construct(Payment $payment, string $status, Collection $reservations, Client $client)
+    public function __construct(Payment $payment, string $status, Collection $bookings, Client $client)
     {
         $this->payment = $payment;
         $this->status = $status;
-        $this->reservations = $reservations;
+        $this->bookings = $bookings;
         $this->client = $client;
     }
 
@@ -50,7 +50,7 @@ class Order
             'id' => $this->id,
             'payment' => $this->payment?->serialize(),
             'status' => $this->status,
-            'reservations' => $this->reservations->map(fn($reservation) => $reservation->serialize())->toArray(),
+            'bookings' => $this->bookings->map(fn($booking) => $booking->serialize())->toArray(),
         ];
     }
 
@@ -96,20 +96,20 @@ class Order
         return $this;
     }
 
-    public function getReservations(): Collection
+    public function getBookings(): Collection
     {
-        return $this->reservations;
+        return $this->bookings;
     }
 
-    public function setReservations(Collection $reservations): static
+    public function setBookings(Collection $bookings): static
     {
-        $this->reservations = $reservations;
+        $this->bookings = $bookings;
 
         return $this;
     }
-    public function addReservation(Booking $reservation): void
+    public function addBooking(Booking $booking): void
     {
-        $this->reservations->add($reservation);
+        $this->bookings->add($booking);
     }
 
     public function checkIsInCart(): void

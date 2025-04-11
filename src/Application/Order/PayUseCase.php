@@ -36,13 +36,22 @@ class PayUseCase
         }
     }
 
+    private function checkClient($clientId, $order): void {
+        $client = $this->clientRepository->find($clientId);
+        if (!$client) {
+            throw new \InvalidArgumentException('Client not found');
+        }
+
+        $client->checkHasOrder($order);
+    }
+
     public function execute($orderId, $clientId): array
     {
         $order = $this->getOrder($orderId);
-        $client = $this->clientRepository->find($clientId);
-        $client->checkHasOrder($order);
-        $order->pay();
 
+        $this->checkClient($clientId, $order);
+
+        $order->pay();
         $this->saveOrder($order);
 
         return $order->serialize();

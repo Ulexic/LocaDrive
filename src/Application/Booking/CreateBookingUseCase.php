@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\Reservation;
+namespace App\Application\Booking;
 
 use App\Entity\Client;
 use App\Entity\Order;
@@ -43,24 +43,24 @@ class CreateBookingUseCase
         return $vehicle;
     }
 
-    private function updateOrder(Order $order, Booking $reservation): void {
-        $order->addReservation($reservation);
-        $order->getPayment()->addPrice($reservation->calculatePrice());
+    private function updateOrder(Order $order, Booking $booking): void {
+        $order->addBooking($booking);
+        $order->getPayment()->addPrice($booking->calculatePrice());
 
         try {
             $this->entityManager->persist($order);
             $this->entityManager->flush();
         } catch (\Exception) {
-            throw new \RuntimeException('Failed to update order with reservation');
+            throw new \RuntimeException('Failed to update order with booking');
         }
     }
 
-    private function saveReservation(Booking $reservation): void {
+    private function saveBooking(Booking $booking): void {
         try {
-            $this->entityManager->persist($reservation);
+            $this->entityManager->persist($booking);
             $this->entityManager->flush();
         } catch (\Exception) {
-            throw new \RuntimeException('Failed to save reservation');
+            throw new \RuntimeException('Failed to save booking');
         }
     }
 
@@ -73,14 +73,14 @@ class CreateBookingUseCase
         $vehicle = $this->getVehicle($vehicleId);
 
         try {
-            $reservation = new Booking($vehicle, $startDate, $endDate, null, $order);
+            $booking = new Booking($vehicle, $startDate, $endDate, null, $order);
         } catch (\InvalidArgumentException $e) {
-            throw new \InvalidArgumentException('Invalid reservation data: ' . $e->getMessage());
+            throw new \InvalidArgumentException('Invalid booking data: ' . $e->getMessage());
         }
 
-        $this->saveReservation($reservation);
+        $this->saveBooking($booking);
 
-        $this->updateOrder($order, $reservation);
-        return $reservation->serialize();
+        $this->updateOrder($order, $booking);
+        return $booking->serialize();
     }
 }

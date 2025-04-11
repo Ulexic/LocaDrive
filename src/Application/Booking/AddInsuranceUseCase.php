@@ -1,38 +1,38 @@
 <?php
 
-namespace App\Application\Reservation;
+namespace App\Application\Booking;
 
 use App\Entity\Insurance;
 use App\Entity\Order;
 use App\Entity\Booking;
 use App\Repository\ClientRepository;
 use App\Repository\InsuranceRepository;
-use App\Repository\ReservationRepository;
+use App\Repository\BookingRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class AddInsuranceUseCase
 {
     private EntityManagerInterface $entityManager;
-    private ReservationRepository $reservationRepository;
+    private BookingRepository $bookingRepository;
     private InsuranceRepository $insuranceRepository;
 
     private ClientRepository $clientRepository;
 
 
-    public function __construct(EntityManagerInterface $entityManager, ReservationRepository $reservationRepository, InsuranceRepository $insuranceRepository, ClientRepository $clientRepository){
+    public function __construct(EntityManagerInterface $entityManager, BookingRepository $bookingRepository, InsuranceRepository $insuranceRepository, ClientRepository $clientRepository){
         $this->entityManager = $entityManager;
-        $this->reservationRepository = $reservationRepository;
+        $this->bookingRepository = $bookingRepository;
         $this->insuranceRepository = $insuranceRepository;
         $this->clientRepository = $clientRepository;
     }
 
-    private function getReservation($id): Booking
+    private function getBooking($id): Booking
     {
-        $reservation = $this->reservationRepository->find($id);
-        if (!$reservation) {
+        $booking = $this->bookingRepository->find($id);
+        if (!$booking) {
             throw new \InvalidArgumentException('Booking not found');
         }
-        return $reservation;
+        return $booking;
     }
 
     private function getInsurance($id): Insurance
@@ -53,20 +53,29 @@ class AddInsuranceUseCase
         }
     }
 
-    public function execute($reservationId, $insuranceId, $clientId): array
-    {
+    private function checkClient($clientId, $booking): void {
         $client = $this->clientRepository->find($clientId);
-        $client->checkHasReservation($reservationId);
+        if (!$client) {
+            throw new \InvalidArgumentException('Client not found');
+        }
 
-        $reservation = $this->getReservation($reservationId);
-        $reservation->getOrder()->checkIsInCart();
+        $client->checkHasBooking($booking);
+    }
+    public function execute($bookingId, $insuranceId, $clientId): array
+    {
+
+        $booking = $this->getBooking($bookingId);
+
+        $this->checkClient($clientId, $booking);
+
+        $booking->getOrder()->checkIsInCart();
         $insurance = $this->getInsurance($insuranceId);
 
-        $reservation->addInsurance($insurance);
-        $reservation->getOrder()->getPayment()->addPrice($insurance->getPrice());
+        $booking->addInsurance($insurance);
+        $booking->getOrder()->getPayment()->addPrice($insurance->getPrice());
 
-        $this->saveOrder($reservation->getOrder());
+        $this->saveOrder($booking->getOrder());
 
-        return $reservation->serialize();
+        return $booking->serialize();
     }
 }
